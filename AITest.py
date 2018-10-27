@@ -39,25 +39,25 @@ def plot_colours(col, perm):
 	plt.show()
 
 
-def calcDistance(col1, col2):
+def calc_distance(col1, col2):  # calculates difference between two colours
 	distance = 0
 	for x in range(len(col1)):
 		distance += (float(col2[x]) - float(col1[x])) ** 2
 	return maths.sqrt(distance)
 
 
-def greedy(testCols):
-	colours = testCols.copy()
-	orderedColours = []
-	colour = colours[random.randint(0, len(colours))]
+def greedy(testCols):	# nearest neighbor algorithm
+	colours = testCols.copy()	# init list of unordered colours
+	orderedColours = []			# init list of ordered colours
+	colour = colours[random.randint(0, len(colours))]	# random starting colour
 	# colour = colours[s0]
-	orderedColours.append(colour)
+	orderedColours.append(colour)		# init first colour
 	colours.remove(colour)
-	for x in range(len(testCols) - 1):
-		closestDistance = 100
-		closestColour = [0, 0, 0]
-		for colourIter in colours:
-			distance = calcDistance(colour, colourIter)
+	for x in range(len(testCols) - 1): 	# loop takes colour and finds nearest neighbor from unordered list
+		closestDistance = 100			# nearest neighbor is added to ordered colour list and taken away from
+		closestColour = [0, 0, 0]		# unordered list so it can't be picked again
+		for colourIter in colours:		# I ordered the colours instead of making a permutation so its converted later
+			distance = calc_distance(colour, colourIter)
 			if distance < closestDistance and distance > 0:
 				closestColour = copy.deepcopy(colourIter)
 				closestDistance = copy.deepcopy(distance)
@@ -70,11 +70,11 @@ def greedy(testCols):
 	return orderedColours
 
 
-def getRGB(colour):
+def getRGB(colour):	# gets actual RGB value of colour, only used for debugging
 	rgbcol = [round(float(i) * 255) for i in colour]
 	return rgbcol
 
-def getPerm(colOrder, testCols):
+def getPerm(colOrder, testCols):	# gets the permutation of the ordered colour list from greedy function
 	perm = []
 	for i in range(len(colOrder)):
 		for j in range(len(testCols)):
@@ -83,17 +83,17 @@ def getPerm(colOrder, testCols):
 
 	return perm
 
-def hill_climber_body(starting_sol, testCols):
-	perm = random.sample(range(len(testCols)), len(testCols))
+def hill_climber_body(starting_sol, testCols):  # this function is the logic of the hill climber, called
+	perm = random.sample(range(len(testCols)), len(testCols))	# by the single and multi versions
 	solution_gradient = []
-	for i in range(100):
-		perm_neighbor = get_random_neighbor(perm)
-		if evaluate(perm, testCols) > evaluate(perm_neighbor, testCols):
-			perm = copy.deepcopy(perm_neighbor)
-		solution_gradient.append(perm)
-	return perm, solution_gradient
+	for i in range(1000): # change this number for more or less iterations, it takes about 10000 to come close to greedy
+		perm_neighbor = get_random_neighbor(perm)	# finds random neighbor (see function)
+		if evaluate(perm, testCols) > evaluate(perm_neighbor, testCols): 	# basically exactly the pseudo code
+			perm = copy.deepcopy(perm_neighbor)								# on the assignment hand out
+		solution_gradient.append(perm)			# checks to see if random neighbor is a better solution
+	return perm, solution_gradient				# if so repeat with neighbor, if not repeat with same permutation
 
-def hill_climber(testCols):
+def hill_climber(testCols):		# calls hill climber single start, creates a solution gradient needed for the the graphs
 	starting_perm = random.sample(range(len(testCols)), len(testCols))
 	perm, solution_list = hill_climber_body(starting_perm, testCols)
 	solution_gradient = []
@@ -102,31 +102,31 @@ def hill_climber(testCols):
 	return perm, solution_gradient
 
 
-def get_random_neighbor(perm):
-	random_limits = [0, 0]
-	random_limits[0] = random.randint(0, len(perm))
-	random_limits[1] = random.randint(0, len(perm))
-	random_limits.sort()
-	reverse_portion = perm[random_limits[0]:random_limits[1]]
-	perm = [x for x in perm if x not in reverse_portion]
+def get_random_neighbor(perm):	# finds random neighbor
+	random_limits = [0, 0]								# reverses a part of the permutation to create list
+	random_limits[0] = random.randint(0, len(perm))		# i think this is full of shit but its what she said to do
+	random_limits[1] = random.randint(0, len(perm))		# creates a random upper and lower limit
+	random_limits.sort()								# reverses everything inside the limits
+	reverse_portion = perm[random_limits[0]:random_limits[1]]	# [0,1,2,3,4,5,6] with limits 2 and 5
+	perm = [x for x in perm if x not in reverse_portion]		# becomes [0,1,4,3,2,5,6]
 	reverse_portion = list(reversed(reverse_portion))
 	for i in range(len(reverse_portion)):
 		perm.insert(random_limits[0] + i, reverse_portion[i])
 	return perm
 
 
-def evaluate(perm, testCols):
-	total_distance = 0
+def evaluate(perm, testCols):	# adds up the difference between all of the colours to measure
+	total_distance = 0			# how good the permutation is
 	for i in range(len(perm)-1):
 		x = perm[i]
 		y= perm[i+1]
-		total_distance += calcDistance(testCols[perm[i]], testCols[perm[i+1]])
+		total_distance += calc_distance(testCols[perm[i]], testCols[perm[i+1]])
 	return total_distance
 
-def multi_hill_climb(testCols):
-	best_perms = []
-	perm_gradients = []
-	for i in range(30):
+def multi_hill_climb(testCols):		# calls hill climb a bunch of times with different starting colours
+	best_perms = []					# tracks the massive amounts of data that is produced
+	perm_gradients = []				# even small amounts of iterations on this one take a while
+	for i in range(30):				# fucking worst one haha
 		best_perm, perm_gradient = hill_climber(testCols)
 		best_perms.append(best_perm)
 		perm_gradients.append(perm_gradient)
@@ -153,32 +153,41 @@ permutation = random.sample(range(test_size), test_size)
 print(str(evaluate(permutation, test_colours)) + " random perm")
 # produces random pemutation of lenght test_size, from the numbers 0 to test_size -1
 
+#uncomment this block for greedy
 # greedycols = greedy(test_colours)
 # greedyPerm = getPerm(greedycols, test_colours)
 # greedyPerm = list(map(int, greedyPerm))
 # print(str(evaluate(greedyPerm, test_colours)) + " greedy perm")
+# plot_colours(test_colours, greedyPerm)
 
-
+# uncomment this block for single start hill climber
 # hill_perm, sol_gradient = hill_climber(test_colours)
 # print(str(evaluate(hill_perm, test_colours)) + " hill climber perm")
+# plot_colours(test_colours, hill_perm)
 # plt.figure()
 # plt.plot(sol_gradient)
 # plt.show()
 
-multi_hill_perms, perm_gradients = multi_hill_climb(test_colours)
-lowest_score = 100
-lowest_perm = []
-for x in multi_hill_perms:
-	perm_score = evaluate(x, test_colours)
-	print(perm_score)
-	if  perm_score < lowest_score:
-		lowest_score = perm_score
-		lowest_perm = x
-
-print(str(evaluate(lowest_perm, test_colours)) + " multi")
-# plot_colours(test_colours, permutation)
-# plot_colours(test_colours, greedyPerm)
-# plot_colours(test_colours, hill_perm)
+# uncomment this block for multi hill start, still need to do some work to sort through the fucking
+# mountain of data it returns
+# multi_hill_perms, perm_gradients = multi_hill_climb(test_colours)
+# lowest_score = 100
+# lowest_perm = []
+# for x in multi_hill_perms:
+# 	perm_score = evaluate(x, test_colours)
+# 	print(perm_score)
+# 	if  perm_score < lowest_score:
+# 		lowest_score = perm_score
+# 		lowest_perm = x
+#
+# print(str(evaluate(lowest_perm, test_colours)) + " multi")
+#
+#
+#
+#
+#
+#
+# plot_colours(test_colours, permutation) # this is the random permutation plot
 
 
 
