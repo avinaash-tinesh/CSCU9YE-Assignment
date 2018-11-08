@@ -147,13 +147,14 @@ def simulated_annealing(num_sims, testCols):
                 perm = new_perm
                 starting_sol = new_sol
                 print("Current best solution: %s" % starting_sol)
-                solution_gradient.append(starting_sol)
+                # solution_gradient.append(starting_sol)
             else:
                 if p_acceptance > random.random():
                     perm = new_perm
                     starting_sol = new_sol
                     print("Current best solution: %s" % starting_sol)
-                    solution_gradient.append(starting_sol)
+                    # solution_gradient.append(starting_sol)
+            solution_gradient.append(starting_sol)
         temp = temp * alpha
     print("No. iterations per temperature: %d\n" % loop_counter)
 
@@ -168,7 +169,7 @@ os.chdir(dir_path)  # Change the working directory so we can read the file
 
 ncolors, colours = read_file('colours.txt')  # Total number of colours and list of colours
 
-test_size = 1000  # Size of the subset of colours for testing
+test_size = 100  # Size of the subset of colours for testing
 test_colours = colours[0:test_size]  # list of colours for testing
 
 permutation = random.sample(range(test_size), test_size)
@@ -211,12 +212,12 @@ print(str(evaluate(permutation, test_colours)) + " random perm")
 # print(str(evaluate(lowest_perm, test_colours)) + " multi")
 
 # Uncomment this block for simulated annealing
-# sa_perm, sa_gradient = simulated_annealing(600, test_colours)
-# print("Simulated Annealing: " + str(evaluate(sa_perm, test_colours)))
-# plot_colours(test_colours, sa_perm)
-# plt.figure()
-# plt.plot(sa_gradient)
-# plt.show()
+sa_perm, sa_gradient = simulated_annealing(600, test_colours)
+print("Simulated Annealing: " + str(evaluate(sa_perm, test_colours)))
+plot_colours(test_colours, sa_perm)
+plt.figure()
+plt.plot(sa_gradient)
+plt.show()
 
 
 # plot_colours(test_colours, permutation) # this is the random permutation plot
