@@ -215,18 +215,20 @@ def multi_simulated_annealing(testCols, tries, num_sims):
     time_start = time.time()
 
     best_distances = []
-    best_perm, best_objective_value = simulated_annealing(num_sims, testCols)[0:2]
+    best_perm = simulated_annealing(num_sims, testCols)[0]
+    best_objective_value = evaluate(best_perm, testCols)
     best_distances.append(best_objective_value)
 
     for i in range(tries - 1):
-        perm, distance = simulated_annealing(num_sims, testCols)[0:2]
+        perm = simulated_annealing(num_sims, testCols)[0]
+        distance = evaluate(perm, testCols)
         if distance < best_objective_value:
-            best_objective_value = best_distance
+            best_perm, best_objective_value = perm, distance
         best_distances.append(best_objective_value)
 
     time_end = time.time() - time_start
 
-    return best_perms, best_gradients, best_objective_value, np.mean(best_objective_value), np.median(best_objective_value), np.std(best_objective_value), time_end
+    return best_perms, best_distances, best_objective_value, np.mean(best_objective_value), np.median(best_objective_value), np.std(best_objective_value), time_end
 
 
 #####_______main_____######
@@ -292,7 +294,7 @@ print(str(evaluate(permutation, test_colours)) + " random perm")
 
 # multi sa
 multi_sa_perms, multi_sa_gradients, multi_sa_obj_val, multi_sa_mean, multi_sa_median, multi_sa_std, multi_sa_run_time = multi_simulated_annealing(test_colours, 30, 600)
-print("Simulated Annealing (Multi-Start): " + str(multi_sa_obj_val))
+print("Simulated Annealing (Multi-Start): {}".format(multi_sa_obj_val))
 print("Mean: {}".format(multi_sa_mean))
 print("Median: {}".format(multi_sa_median))
 print("Standard Deviation: {}".format(multi_sa_std))
