@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import os
-import math as maths
 import copy
+import time
+import math as maths
 from AITest import *
 
 # Display the colours in the order of the permutation in a pyplot window
@@ -25,11 +26,21 @@ def plot_colours(col, perm):
     plt.show()
 
 
+'''
+    Euclidean distance function
+'''
+
+
 def calc_distance(col1, col2):  # calculates difference between two colours
     distance = 0
     for x in range(len(col1)):
         distance += (float(col2[x]) - float(col1[x])) ** 2
     return maths.sqrt(distance)
+
+
+'''
+    Greedy Heuristic
+'''
 
 
 def greedy(testCols):  # nearest neighbor algorithm
@@ -42,10 +53,10 @@ def greedy(testCols):  # nearest neighbor algorithm
     for x in range(len(testCols) - 1):  # loop takes colour and finds nearest neighbor from unordered list
         closestDistance = 100           # nearest neighbor is added to ordered colour list and taken away from
         closestColour = [0, 0, 0]       # unordered list so it can't be picked again
-        for colourIter in colours:      # I ordered the colours instead of making a permutation so its converted later
-            distance = calc_distance(colour, colourIter)
+        for colournum_sims in colours:      # I ordered the colours instead of making a permutation so its converted later
+            distance = calc_distance(colour, colournum_sims)
             if distance < closestDistance and distance > 0:
-                closestColour = copy.deepcopy(colourIter)
+                closestColour = copy.deepcopy(colournum_sims)
                 closestDistance = copy.deepcopy(distance)
         orderedColours.append(closestColour)
 
@@ -69,37 +80,61 @@ def getPerm(colOrder, testCols):  # gets the permutation of the ordered colour l
     return perm
 
 
-def hill_climber_body(starting_sol, testCols, iter):  # this function is the logic of the hill climber, called
-    perm = random.sample(range(len(testCols)), len(testCols))  # by the single and multi versions
-    solution_gradient = []
-    for i in range(iter):  # it takes about 10000 to come close to greedy
-        perm_neighbor = get_random_neighbor(perm)  # finds random neighbor (see function)
-        if evaluate(perm, testCols) > evaluate(perm_neighbor, testCols):    # basically exactly the pseudo code
-            perm = copy.deepcopy(perm_neighbor)                             # on the assignment hand out
-        solution_gradient.append(perm)          # checks to see if random neighbor is a better solution
-    return perm, solution_gradient              # if so repeat with neighbor, if not repeat with same permutation
+'''
+    Hill climbing logic
+'''
 
 
-def hill_climber(testCols, iter):       # calls hill climber single start, creates a solution gradient needed for the the graphs
+def hill_climber_body(starting_sol, testCols, num_sims):
+    perm = random.sample(range(len(testCols)), len(testCols))
+    solution_distances = []
+    for i in range(num_sims):
+        perm_neighbor = get_random_neighbor(perm)
+        if evaluate(perm, testCols) > evaluate(perm_neighbor, testCols):
+            perm = copy.deepcopy(perm_neighbor)
+        solution_distances.append(perm)
+    return perm, solution_distances
+
+
+'''
+    Hill climber method
+'''
+
+
+def hill_climber(testCols, num_sims):
+    # Init time
+    time_start = time.time()
+
     starting_perm = random.sample(range(len(testCols)), len(testCols))
-    perm, solution_list = hill_climber_body(starting_perm, testCols, iter)
+    perm, solution_list = hill_climber_body(starting_perm, testCols, num_sims)
     solution_gradient = []
     for sol in solution_list:
         solution_gradient.append(evaluate(sol, test_colours))
-    return perm, solution_gradient
+    time_end = time.time() - time_start
+    return perm, solution_gradient, time_end
 
 
-def get_random_neighbor(perm):  # finds random neighbor
-    random_limits = [0, 0]                              # reverses a part of the permutation to create list
-    random_limits[0] = random.randint(0, len(perm))     # i think this is full of shit but its what she said to do
-    random_limits[1] = random.randint(0, len(perm))     # creates a random upper and lower limit
-    random_limits.sort()                                # reverses everything inside the limits
-    reverse_portion = perm[random_limits[0]:random_limits[1]]  # [0,1,2,3,4,5,6] with limits 2 and 5
-    perm = [x for x in perm if x not in reverse_portion]        # becomes [0,1,4,3,2,5,6]
+'''
+    Get random neighbor function
+'''
+
+
+def get_random_neighbor(perm):
+    random_limits = [0, 0]
+    random_limits[0] = random.randint(0, len(perm))
+    random_limits[1] = random.randint(0, len(perm))
+    random_limits.sort()
+    reverse_portion = perm[random_limits[0]:random_limits[1]]
+    perm = [x for x in perm if x not in reverse_portion]
     reverse_portion = list(reversed(reverse_portion))
     for i in range(len(reverse_portion)):
         perm.insert(random_limits[0] + i, reverse_portion[i])
     return perm
+
+
+'''
+    Evaluate function, compares euclidean distances between colors to evaluate results from algorithm
+'''
 
 
 def evaluate(perm, testCols):  # adds up the difference between all of the colours to measure
@@ -111,54 +146,87 @@ def evaluate(perm, testCols):  # adds up the difference between all of the colou
     return total_distance
 
 
-def multi_hill_climb(testCols, tries, iter):        # calls hill climb a bunch of times with different starting colours
+'''
+    Multi Start Hill Climbing
+'''
+
+
+def multi_hill_climb(testCols, tries, num_sims):        # calls hill climb a bunch of times with different starting colours
+    # Init time
+    time_start = time.time()
+
     best_perms = []                 # tracks the massive amounts of data that is produced
-    perm_gradients = []             # even small amounts of iterations on this one take a while
+    perm_gradients = []             # even small amounts of num_simsations on this one take a while
     for i in range(tries):              # fucking worst one haha
-        best_perm, perm_gradient = hill_climber(testCols, iter)
+        best_perm, perm_gradient = hill_climber(testCols, num_sims)[0:2]
         best_perms.append(best_perm)
         perm_gradients.append(perm_gradient)
+    time_end = time.time() - time_start
 
-    return best_perms, perm_gradients
+    return best_perms, perm_gradients, time_end
 
-# Simulated Annealing
+
+'''
+    Simulated Annealing
+'''
 
 
 def simulated_annealing(num_sims, testCols):
+    # Init time
+    time_start = time.time()
+
     # Initialize random solution and calculate cost
     perm = random.sample(range(len(testCols)), len(testCols))
     starting_sol = evaluate(perm, testCols)
-    solution_gradient = []
-    solution_gradient.append(starting_sol)
+    solution_distances = []
+    solution_distances.append(starting_sol)
 
     # Set start temperature, finishing temperature and alpha values
     temp = 1.0
     temp_fin = 0.00001
     alpha = 0.9
 
-    loop_counter = 0
     while temp > temp_fin:
-        loop_counter += 1
         for i in range(num_sims):
             new_perm = get_random_neighbor(perm)
             new_sol = evaluate(new_perm, testCols)
-            p_acceptance = np.exp(-(new_sol - starting_sol) / temp)
+
             if new_sol < starting_sol:
                 perm = new_perm
                 starting_sol = new_sol
-                print("Current best solution: %s" % starting_sol)
-                # solution_gradient.append(starting_sol)
             else:
+                p_acceptance = np.exp(-(new_sol - starting_sol) / temp)
                 if p_acceptance > random.random():
                     perm = new_perm
                     starting_sol = new_sol
-                    print("Current best solution: %s" % starting_sol)
-                    # solution_gradient.append(starting_sol)
-            solution_gradient.append(starting_sol)
+            solution_distances.append(starting_sol)
         temp = temp * alpha
-    print("No. iterations per temperature: %d\n" % loop_counter)
+    time_end = time.time() - time_start
+    return perm, solution_distances, time_end
 
-    return perm, solution_gradient
+
+'''
+    Multi Start Simulated Annealing
+'''
+
+
+def multi_simulated_annealing(testCols, tries, num_sims):
+    # Init time
+    time_start = time.time()
+
+    best_distances = []
+    best_perm, best_objective_value = simulated_annealing(num_sims, testCols)[0:2]
+    best_distances.append(best_objective_value)
+
+    for i in range(tries - 1):
+        perm, distance = simulated_annealing(num_sims, testCols)[0:2]
+        if distance < best_objective_value:
+            best_objective_value = best_distance
+        best_distances.append(best_objective_value)
+
+    time_end = time.time() - time_start
+
+    return best_perms, best_gradients, best_objective_value, np.mean(best_objective_value), np.median(best_objective_value), np.std(best_objective_value), time_end
 
 
 #####_______main_____######
@@ -190,8 +258,9 @@ print(str(evaluate(permutation, test_colours)) + " random perm")
 # plot_colours(test_colours, greedyPerm)
 
 # uncomment this block for single start hill climber
-# hill_perm, sol_gradient = hill_climber(test_colours, 1000)
-# print(str(evaluate(hill_perm, test_colours)) + " hill climber perm")
+# hill_perm, sol_gradient, hill_run_time = hill_climber(test_colours, 1000)
+# print("Hill climbing: " + str(evaluate(hill_perm, test_colours)))
+# print("Completed in %.5f seconds" % hill_run_time)
 # plot_colours(test_colours, hill_perm)
 # plt.figure()
 # plt.plot(sol_gradient)
@@ -199,24 +268,38 @@ print(str(evaluate(permutation, test_colours)) + " random perm")
 
 # uncomment this block for multi hill start, still need to do some work to sort through the fucking
 # mountain of data it returns
-# multi_hill_perms, perm_gradients = multi_hill_climb(test_colours, 30, 2000)
+# multi_hill_perms, perm_gradients, multi_hill_run_time = multi_hill_climb(test_colours, 30, 2000)
 # lowest_score = 100
 # lowest_perm = []
 # for x in multi_hill_perms:
-#   perm_score = evaluate(x, test_colours)
-#   print(perm_score)
-#   if  perm_score < lowest_score:
-#       lowest_score = perm_score
-#       lowest_perm = x
-#
-# print(str(evaluate(lowest_perm, test_colours)) + " multi")
+#     perm_score = evaluate(x, test_colours)
+#     print(perm_score)
+#     if perm_score < lowest_score:
+#         lowest_score = perm_score
+#         lowest_perm = x
+
+# print("Multi-start hill climbing: " + str(evaluate(lowest_perm, test_colours)))
+# print("Completed in %.5f seconds" % multi_hill_run_time)
 
 # Uncomment this block for simulated annealing
-sa_perm, sa_gradient = simulated_annealing(600, test_colours)
-print("Simulated Annealing: " + str(evaluate(sa_perm, test_colours)))
-plot_colours(test_colours, sa_perm)
+# sa_perm, sa_gradient, sa_run_time = simulated_annealing(300, test_colours)
+# print("Simulated Annealing: " + str(evaluate(sa_perm, test_colours)))
+# print("Completed in %.5f seconds" % sa_run_time)
+# plot_colours(test_colours, sa_perm)
+# plt.figure()
+# plt.plot(sa_gradient)
+# plt.show()
+
+# multi sa
+multi_sa_perms, multi_sa_gradients, multi_sa_obj_val, multi_sa_mean, multi_sa_median, multi_sa_std, multi_sa_run_time = multi_simulated_annealing(test_colours, 30, 600)
+print("Simulated Annealing (Multi-Start): " + str(multi_sa_obj_val))
+print("Mean: {}".format(multi_sa_mean))
+print("Median: {}".format(multi_sa_median))
+print("Standard Deviation: {}".format(multi_sa_std))
+print("Completed in %.5f seconds" % multi_sa_run_time)
+plot_colours(test_colours, multi_sa_obj_val)
 plt.figure()
-plt.plot(sa_gradient)
+plt.plot(multi_sa_gradients)
 plt.show()
 
 
