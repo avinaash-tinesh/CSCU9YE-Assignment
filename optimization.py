@@ -66,7 +66,7 @@ def evaluate(perm, testCols):
     for i in range(len(perm) - 1):
         x = perm[i]
         y = perm[i + 1]
-        total_distance += calc_distance(testCols[perm[i]], testCols[perm[i + 1]])
+        total_distance += calc_distance(testCols[x], testCols[y])
     return total_distance
 
 
