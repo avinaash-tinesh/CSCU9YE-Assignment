@@ -21,7 +21,9 @@ def run_test(test_size, i):
 
     '''------------Random Permutation------------'''
     permutation = random.sample(range(test_size), test_size)
+    print("---------------------Random Permutation {} Colors---------------------".format(test_size))
     print("Random Permutation {}: {}".format(test_size, str(evaluate(permutation, test_colours))))
+    print("\n")
     plot_colours(test_colours, permutation, "Random Permutation - {} Colors".format(test_size))
 
     if i == 1:
@@ -29,12 +31,14 @@ def run_test(test_size, i):
         greedycols = greedy(test_colours)
         greedyPerm = getPerm(greedycols, test_colours)
         greedyPerm = list(map(int, greedyPerm))
+        print("---------------------Greedy Constructive Heuristic {} Colors---------------------".format(test_size))
         print("Greedy Constructive Heuristic: {}".format(str(evaluate(greedyPerm, test_colours))))
         plot_colours(test_colours, greedyPerm, "Greedy Constructive Heuristic - {} Colors".format(test_size))
 
     elif i == 2:
         '''---------------Single Start Hill Climber---------------'''
         hill_perm, hill_obj_val, hill_distances, hill_run_time = hill_climbing(9900, test_colours)
+        print("---------------------Hill Climbing {} Colors---------------------")
         print("Hill climbing: {}".format(hill_obj_val))
         print("Completed in %.5f seconds" % hill_run_time)
         plot_colours(test_colours, hill_perm, "Hill Climbing - {} Colors".format(test_size))
@@ -49,6 +53,7 @@ def run_test(test_size, i):
     elif i == 3:
         '''---------------Multi Start Hill Climber---------------'''
         multi_hill_perm, multi_hill__distances, multi_hill_obj_val, multi_hill_mean, multi_hill_median, multi_hill_std, multi_hill_run_time = multi_hill_climb(test_colours, 30, 110000)
+        print("---------------------Multi Start Hill Climbing {} Colors---------------------".format(test_size))
         print("Multi-start hill climbing: {}".format(multi_hill_obj_val))
         print("Mean: {}".format(multi_hill_mean))
         print("Median: {}".format(multi_hill_median))
@@ -66,6 +71,7 @@ def run_test(test_size, i):
     elif i == 4:
         '''---------------Simulated Annealing---------------'''
         sa_perm, sa_obj_val, sa_distances, sa_run_time = simulated_annealing(750, test_colours)
+        print("---------------------Simulated Annealing {} Colors---------------------".format(test_size))
         print("Simulated Annealing: {}".format(sa_obj_val))
         print("Completed in %.5f seconds" % sa_run_time)
         plot_colours(test_colours, sa_perm, "Simulated Annealing - {} Colors".format(test_size))
@@ -80,6 +86,7 @@ def run_test(test_size, i):
     elif i == 5:
         '''---------------Multi Start Simulated Annealing---------------'''
         multi_sa_perm, multi_sa_distances, multi_sa_obj_val, multi_sa_mean, multi_sa_median, multi_sa_std, multi_sa_run_time = multi_simulated_annealing(test_colours, 30, 750)
+        print("---------------------Multi Start Simulated Annealing {} Colors---------------------".format(test_size))
         print("Simulated Annealing (Multi-Start): {}".format(multi_sa_obj_val))
         print("Mean: {}".format(multi_sa_mean))
         print("Median: {}".format(multi_sa_median))
