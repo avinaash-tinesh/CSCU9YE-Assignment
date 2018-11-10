@@ -24,7 +24,10 @@ def plot_colours(col, perm, plt_name):
     axes.imshow(img, interpolation='nearest')
     axes.axis('off')
     plt.savefig("Graphs/{}.png".format(plt_name), bbox_inches="tight")
-    plt.show()
+    plt.title("Visualization for {}".format(plt_name))
+    plt.show(block=False)
+    plt.pause(5)
+    plt.close()
 
 
 '''
@@ -44,7 +47,7 @@ def calc_distance(col1, col2):  # calculates difference between two colours
 '''
 
 
-def getPerm(colOrder, testCols):  
+def getPerm(colOrder, testCols):
     perm = []
     for i in range(len(colOrder)):
         for j in range(len(testCols)):
@@ -65,6 +68,7 @@ def evaluate(perm, testCols):
         y = perm[i + 1]
         total_distance += calc_distance(testCols[perm[i]], testCols[perm[i + 1]])
     return total_distance
+
 
 '''
     Get random neighbor function
@@ -241,4 +245,3 @@ ncolors, colours = read_file('colours.txt')  # Total number of colours and list 
 
 test_size = 500  # Size of the subset of colours for testing
 test_colours = colours[0:test_size]  # list of colours for testing
-
