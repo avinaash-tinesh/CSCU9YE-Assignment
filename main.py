@@ -65,8 +65,8 @@ def run_test(test_size, i):
 
     elif i == 4:
         '''---------------Simulated Annealing---------------'''
-        sa_perm, sa_distances, sa_run_time = simulated_annealing(750, test_colours)
-        print("Simulated Annealing: " + str(evaluate(sa_perm, test_colours)))
+        sa_perm, sa_obj_val, sa_distances, sa_run_time = simulated_annealing(750, test_colours)
+        print("Simulated Annealing: {}".format(sa_obj_val))
         print("Completed in %.5f seconds" % sa_run_time)
         plot_colours(test_colours, sa_perm, "Simulated Annealing - {} Colors".format(test_size))
         plt.figure()
