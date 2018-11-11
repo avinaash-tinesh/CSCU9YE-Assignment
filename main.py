@@ -33,6 +33,7 @@ def run_test(test_size, i):
         greedyPerm = list(map(int, greedyPerm))
         print("---------------------Greedy Constructive Heuristic {} Colors---------------------".format(test_size))
         print("Greedy Constructive Heuristic: {}".format(str(evaluate(greedyPerm, test_colours))))
+        print("\n")
         plot_colours(test_colours, greedyPerm, "Greedy Constructive Heuristic - {} Colors".format(test_size))
 
     elif i == 2:
@@ -41,6 +42,7 @@ def run_test(test_size, i):
         print("---------------------Hill Climbing {} Colors---------------------")
         print("Hill climbing: {}".format(hill_obj_val))
         print("Completed in %.5f seconds" % hill_run_time)
+        print("\n")
         plot_colours(test_colours, hill_perm, "Hill Climbing - {} Colors".format(test_size))
         plt.figure()
         plt.plot(hill_distances)
@@ -59,6 +61,7 @@ def run_test(test_size, i):
         print("Median: {}".format(multi_hill_median))
         print("Standard Deviation: {}".format(multi_hill_std))
         print("Completed in %.5f seconds" % multi_hill_run_time)
+        print("\n")
         plot_colours(test_colours, multi_hill_perm, "Multi-Start Hill Climbing - {} Colors".format(test_size))
         plt.figure()
         plt.plot(multi_hill__distances)
@@ -92,6 +95,7 @@ def run_test(test_size, i):
         print("Median: {}".format(multi_sa_median))
         print("Standard Deviation: {}".format(multi_sa_std))
         print("Completed in %.5f seconds" % multi_sa_run_time)
+        print("\n")
         plot_colours(test_colours, multi_sa_perm, "Multi-Start Simulated Annealing - {} Colors".format(test_size))
         plt.figure()
         plt.boxplot(multi_sa_distances)
@@ -126,6 +130,7 @@ def run_all(test_size):
     greedyPerm = list(map(int, greedyPerm))
     print("---------------------Greedy Constructive Heuristic {} Colors---------------------".format(test_size))
     print("Greedy Constructive Heuristic: {}".format(str(evaluate(greedyPerm, test_colours))))
+    print("\n")
     plot_colours(test_colours, greedyPerm, "Greedy Constructive Heuristic - {} Colors".format(test_size))
 
     '''---------------Single Start Hill Climber---------------'''
@@ -133,6 +138,7 @@ def run_all(test_size):
     print("---------------------Hill Climbing {} Colors---------------------".format(test_size))
     print("Hill climbing: {}".format(hill_obj_val))
     print("Completed in %.5f seconds" % hill_run_time)
+    print("\n")
     plot_colours(test_colours, hill_perm, "Hill Climbing - {} Colors".format(test_size))
     plt.figure()
     plt.plot(hill_distances)
@@ -150,6 +156,7 @@ def run_all(test_size):
     print("Median: {}".format(multi_hill_median))
     print("Standard Deviation: {}".format(multi_hill_std))
     print("Completed in %.5f seconds" % multi_hill_run_time)
+    print("\n")
     plot_colours(test_colours, multi_hill_perm, "Multi-Start Hill Climbing - {} Colors".format(test_size))
     plt.figure()
     plt.plot(multi_hill__distances)
@@ -164,6 +171,7 @@ def run_all(test_size):
     print("---------------------Simulated Annealing {} Colors---------------------".format(test_size))
     print("Simulated Annealing: {}".format(sa_obj_val))
     print("Completed in %.5f seconds" % sa_run_time)
+    print("\n")
     plot_colours(test_colours, sa_perm, "Simulated Annealing - {} Colors".format(test_size))
     plt.figure()
     plt.plot(sa_distances)
@@ -181,6 +189,7 @@ def run_all(test_size):
     print("Median: {}".format(multi_sa_median))
     print("Standard Deviation: {}".format(multi_sa_std))
     print("Completed in %.5f seconds" % multi_sa_run_time)
+    print("\n")
     plot_colours(test_colours, multi_sa_perm, "Multi-Start Simulated Annealing - {} Colors".format(test_size))
     plt.figure()
     plt.boxplot(multi_sa_distances)
@@ -191,5 +200,5 @@ def run_all(test_size):
     plt.close()
 
 
-# run_test(100, 1)
-run_all(100)
+run_test(100, 1)
+# run_all(100)
